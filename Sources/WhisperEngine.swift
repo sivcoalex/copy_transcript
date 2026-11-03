@@ -41,7 +41,15 @@ final class WhisperEngine {
 
     deinit { unloadLocked() }
 
-    var isLoaded: Bool { queue.sync { ctx != nil } }
+    /// Snapshot for the UI; readable from the main thread without waiting for a running transcription.
+    struct Status { var loaded = false; var unloadAt: Date? }
+    var status: Status { statusLock.withLock { _status } }
+    private let statusLock = NSLock()
+    private var _status = Status()
+
+    private func setStatus(loaded: Bool, unloadAt: Date?) {
+        statusLock.withLock { _status = Status(loaded: loaded, unloadAt: unloadAt) }
+    }
 
     /// Starts loading the model in the background so it's ready by the time recording stops.
     func preload(modelPath: String) {
@@ -97,6 +105,7 @@ final class WhisperEngine {
         guard let newCtx = whisper_init_from_file_with_params(path, cparams) else { throw EngineError.loadFailed }
         ctx = newCtx
         loadedPath = path
+        setStatus(loaded: true, unloadAt: nil)
         return newCtx
     }
 
@@ -157,11 +166,13 @@ final class WhisperEngine {
         timer.setEventHandler { [weak self] in self?.unloadLocked() }
         timer.resume()
         unloadTimer = timer
+        setStatus(loaded: ctx != nil, unloadAt: ctx != nil ? Date().addingTimeInterval(idleUnloadAfter) : nil)
     }
 
     private func cancelUnloadTimer() {
         unloadTimer?.cancel()
         unloadTimer = nil
+        setStatus(loaded: ctx != nil, unloadAt: nil)
     }
 
     private func unloadLocked() {
@@ -170,6 +181,7 @@ final class WhisperEngine {
         whisper_free(ctx)
         self.ctx = nil
         loadedPath = nil
+        setStatus(loaded: false, unloadAt: nil)
         // Hand freed heap pages back to the system right away.
         malloc_zone_pressure_relief(nil, 0)
     }

@@ -22,7 +22,11 @@ final class AudioRecorder {
 
     private var engine: AVAudioEngine?
     private var samples: [Float] = []
+    private var level: Float = 0
     private let lock = NSLock()
+
+    /// Loudness of the most recent audio chunk (RMS, 0…1) for the live level meter.
+    var currentLevel: Float { lock.withLock { level } }
 
     var isRecording: Bool { engine != nil }
 
@@ -64,7 +68,11 @@ final class AudioRecorder {
             }
             guard error == nil, let channel = out.floatChannelData?[0] else { return }
             let chunk = UnsafeBufferPointer(start: channel, count: Int(out.frameLength))
-            self.lock.withLock { self.samples.append(contentsOf: chunk) }
+            let rms = chunk.isEmpty ? 0 : sqrt(chunk.reduce(0) { $0 + $1 * $1 } / Float(chunk.count))
+            self.lock.withLock {
+                self.samples.append(contentsOf: chunk)
+                self.level = rms
+            }
         }
 
         engine.prepare()
@@ -87,6 +95,7 @@ final class AudioRecorder {
         return lock.withLock {
             let result = samples
             samples = []
+            level = 0
             return result
         }
     }

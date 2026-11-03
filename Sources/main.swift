@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 /// Physical memory footprint of this process in MB (what Activity Monitor shows as "Memory").
 func memoryFootprintMB() -> Double {
@@ -15,6 +16,38 @@ func memoryFootprintMB() -> Double {
 // Self-test without UI: Diktafon --transcribe <audio file> [fast|accurate]
 // Transcribes twice with an unload in between to exercise the load → free → reload cycle.
 let args = CommandLine.arguments
+// UI snapshots without the menu bar: Diktafon --snapshot <output dir>
+if let i = args.firstIndex(of: "--snapshot"), args.count > i + 1 {
+    _ = NSApplication.shared
+    let dir = URL(fileURLWithPath: args[i + 1])
+    let cases: [(String, AppState.Phase, Bool, Bool)] = [
+        ("empty", .idle, false, true), ("idle", .idle, false, false), ("recording", .recording, false, false),
+        ("transcribing", .transcribing, false, false), ("settings", .idle, true, false),
+    ]
+    for (name, phase, settings, empty) in cases {
+        for dark in [false, true] {
+            let state = AppState(sideEffects: false)
+            if !empty { state.loadSnapshotData(phase: phase) } else { state.refresh() }
+            let host = NSHostingView(rootView: PopoverView(state: state, showSettings: settings))
+            host.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
+            let size = host.fittingSize
+            let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless],
+                                  backing: .buffered, defer: false)
+            window.appearance = host.appearance
+            window.backgroundColor = dark ? NSColor(white: 0.17, alpha: 1) : NSColor(white: 0.96, alpha: 1)
+            window.contentView = host
+            host.wantsLayer = true
+            host.layer?.backgroundColor = window.backgroundColor.cgColor
+            host.layoutSubtreeIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+            guard let rep = window.contentView?.bitmapImageRepForCachingDisplay(in: host.bounds) else { continue }
+            window.contentView?.cacheDisplay(in: host.bounds, to: rep)
+            let file = dir.appendingPathComponent("\(name)-\(dark ? "dark" : "light").png")
+            try? rep.representation(using: .png, properties: [:])?.write(to: file)
+        }
+    }
+    exit(0)
+}
 if args.contains("--list-devices") {
     let def = InputDevice.systemDefault()
     for d in InputDevice.all() {

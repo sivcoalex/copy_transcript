@@ -28,12 +28,13 @@ curl -fsSL https://raw.githubusercontent.com/sivcoalex/copy_transcript/main/inst
 2. Stlač **⌃⌥ medzerník** – ikonka v lište sa zmení na červený krúžok, môžeš diktovať.
 3. Stlač skratku znova – o pár sekúnd sa ozve „pop“ a text je v schránke. Vlož ho cez **⌘V**.
 
-V menu ikonky nájdeš:
-- **Nastaviť skratku…** – vlastná klávesová skratka
-- **Upraviť slovník…** – slová a názvy, ktoré má model písať presne (napr. `Claude Code`), a opravy typu `Cloud Code => Claude Code`
+Kliknutím na ikonku sa otvorí okno s tlačidlom na nahrávanie, živým zvukovým grafom
+a poslednými 5 prepismi (klik = skopírovať). V nastaveniach (ozubené koliesko) nájdeš:
+- **Skratka** – vlastná klávesová skratka
+- **Slovník** – slová a názvy, ktoré má model písať presne (napr. `Claude Code`), a opravy typu `Cloud Code => Claude Code`
 - **Mikrofón** – automaticky alebo napevno zvolený mikrofón
 - **Model** – rýchly / presnejší
-- posledných 5 prepisov, zvuky, spúšťanie po prihlásení
+- zvuky, spúšťanie po prihlásení
 
 Model sa načíta do pamäte až pri diktovaní a 3 minúty po poslednom použití sa uvoľní,
 takže v nečinnosti appka zaberá len pár desiatok MB.
