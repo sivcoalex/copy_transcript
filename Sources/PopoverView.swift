@@ -385,7 +385,7 @@ private struct SettingsView: View {
                     .disabled(state.phase != .idle)
                 }
                 if !ModelChoice.accurate.isAvailable {
-                    Text("Presnejší model nie je stiahnutý (inštalácia s --presny).")
+                    Text("Presnejší model nie je stiahnutý – spusti inštalačný príkaz znova.")
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity, alignment: .trailing)

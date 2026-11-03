@@ -12,15 +12,11 @@ Otvor **Terminál** a vlož:
 curl -fsSL https://raw.githubusercontent.com/sivcoalex/copy_transcript/main/install.sh | zsh
 ```
 
-Skript stiahne appku do Applications, stiahne model (~830 MB, iba raz) a appku spustí.
+Skript stiahne appku do Applications, stiahne oba modely – **rýchly** (~830 MB) aj **presnejší**
+(~1,1 GB, asi 2× pomalší) – a appku spustí. Modely sa sťahujú iba raz; medzi nimi prepínaš
+v nastaveniach appky → Model. Ten istý príkaz slúži aj na aktualizáciu na novú verziu.
 
-Ak chceš aj presnejší (asi 2× pomalší) model, ktorý potom zvolíš v menu → Model:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/sivcoalex/copy_transcript/main/install.sh | zsh -s -- --presny
-```
-
-**Požiadavky:** Mac s čipom Apple (M1 alebo novší), macOS 14 Sonoma alebo novší, ~1 GB miesta.
+**Požiadavky:** Mac s čipom Apple (M1 alebo novší), macOS 14 Sonoma alebo novší, ~2 GB miesta.
 
 ## Používanie
 

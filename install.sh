@@ -1,8 +1,6 @@
 #!/bin/zsh
 # Diktafón – inštalácia jedným príkazom:
 #   curl -fsSL https://raw.githubusercontent.com/sivcoalex/copy_transcript/main/install.sh | zsh
-# Voliteľne aj presnejší (pomalší) model:
-#   curl -fsSL https://raw.githubusercontent.com/sivcoalex/copy_transcript/main/install.sh | zsh -s -- --presny
 set -euo pipefail
 
 REPO="sivcoalex/copy_transcript"
@@ -49,9 +47,7 @@ download_model() { # <file> <hugging face repo> <description>
 mkdir -p "$MODELS"
 download_model "ggml-silero-v6.2.0.bin" "ggml-org/whisper-vad" "filter reči (1 MB)"
 download_model "ggml-large-v3-turbo-q8_0.bin" "ggerganov/whisper.cpp" "rýchly model (830 MB)"
-if [[ " $* " == *" --presny "* ]]; then
-  download_model "ggml-large-v3-q5_0.bin" "ggerganov/whisper.cpp" "presnejší model (1,1 GB)"
-fi
+download_model "ggml-large-v3-q5_0.bin" "ggerganov/whisper.cpp" "presnejší model (1,1 GB)"
 
 say_step "Spúšťam Diktafón…"
 open "$DEST/Diktafon.app"
